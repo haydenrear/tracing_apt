@@ -14,8 +14,9 @@ class TemplatingEngine {
                 it?.readLines()?.forEach {
                     var read = it
                     for (value in values) {
-                        read = read.replace("{{${value.key}}}", value.value)
+                        read = read.replace("{{${value.key}}}", value.value.strip().replace(System.lineSeparator(), ""))
                     }
+
                     outBuilder.append(System.lineSeparator()).append(read)
                 }
             }
