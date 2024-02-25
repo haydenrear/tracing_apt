@@ -9,6 +9,7 @@ interface ObservationUtility<T: ObservationUtility.ObservationArgs> {
     interface ObservationArgs {
         val joinPoint: JoinPoint
         val id: String
+        val monitoringTypes: List<MonitoringTypes>
     }
 
     fun extract(

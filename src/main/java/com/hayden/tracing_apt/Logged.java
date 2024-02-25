@@ -30,4 +30,6 @@ public @interface Logged {
 
     String logId() default "";
 
+    MonitoringTypes[] monitoringTypes() default {};
+
 }

@@ -1,9 +1,7 @@
 package com.hayden.tracing_apt;
 
 import com.hayden.tracing.observation_aspects.*;
-import org.aopalliance.aop.Advice;
 import org.aspectj.lang.annotation.*;
-import org.checkerframework.checker.units.qual.A;
 
 import java.lang.annotation.*;
 
@@ -17,6 +15,8 @@ public @interface LoggingPattern {
     After[] after() default {};
     Aspect[] aspect() default {};
     Pointcut[] pointcut() default {};
+
+    MonitoringTypes[] monitoringTypes() default {};
 
     String aspectName();
     String aspectFunctionName();

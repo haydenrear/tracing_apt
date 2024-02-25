@@ -4,21 +4,13 @@ import com.hayden.tracing.observation_aspects.*;
 import com.hayden.tracing.template.TemplatingEngine;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,46 +21,59 @@ import java.util.stream.Stream;
 @Slf4j
 public class TracingProcessor extends AbstractProcessor {
 
+    public static final String ASPECT_TEMPLATE = "com/hayden/tracing_apt/template/observation_aspect_provided_template.txt";
+
+
     @SneakyThrows
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         // generate aspectJ aspects
-        Path path = Paths.get("observation_aspect_template.txt");
         annotations.stream()
                 .flatMap(t -> roundEnv.getElementsAnnotatedWith(Cdc.class).stream())
                 .filter(Objects::nonNull)
                 .map(this::getPatterns)
                 .filter(Objects::nonNull)
-                .flatMap(tracingAspect -> {
-                    SuppliedAspect suppliedAspect = tracingAspect.get();
-                    var toReplace = Map.of(
-                            suppliedAspect.aspectClassId(), suppliedAspect.getName().get().getAspectClassName(),
-                            suppliedAspect.adviceId(), suppliedAspect.getAdvice().get(),
-                            suppliedAspect.aspectFunctionId(), suppliedAspect.getName().get().getAspectFunctionName(),
-                            suppliedAspect.afterId(), getPointcut(suppliedAspect, supplied -> supplied instanceof SuppliedAfterPointcut suppliedFound ? suppliedFound.toString() : ""),
-                            suppliedAspect.aroundId(), getPointcut(suppliedAspect, supplied -> supplied instanceof SuppliedAroundPointcut suppliedFound ? suppliedFound.toString() : ""),
-                            suppliedAspect.beforeId(), getPointcut(suppliedAspect, supplied -> supplied instanceof SuppliedBeforePointcut suppliedFound ? suppliedFound.toString() : "")
-                    );
-                    writeToFile("tracing/src/main/resources/out1", suppliedAspect.aspectClassId());
-                    return Stream.of(Map.entry(
-                            suppliedAspect.aspectClassId(),
-                            TemplatingEngine.Companion.replace(toReplace, path)
-                    ));
-                })
-                .forEach(adviceItem -> {
-                    try(var fos = this.processingEnv.getFiler().createSourceFile("com.hayden.tracing_apt.%s".formatted(adviceItem.getKey())).openOutputStream()) {
-                        fos.write(adviceItem.getValue().getBytes(StandardCharsets.UTF_8));
-                    } catch (IOException e) {
-                        writeToFile("src/main/resources/out", e.toString());
-                    }
-                });
+                .flatMap(TracingProcessor::getToWriteJavaAspectFile)
+                .forEach(this::writeAspectFileToFile);
 
         return true;
     }
 
+    private void writeAspectFileToFile(Map.Entry<String, String> adviceItem) {
+        try(var fos = this.processingEnv.getFiler().createSourceFile("com.hayden.tracing_apt.%s".formatted(adviceItem.getKey())).openOutputStream()) {
+            fos.write(adviceItem.getValue().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            System.out.printf("Failed to write: %s\n", e.getMessage());
+        }
+    }
+
+    @NotNull
+    private static Stream<Map.Entry<String, String>> getToWriteJavaAspectFile(TracingAspectSupplier tracingAspect) {
+        SuppliedAspect suppliedAspect = tracingAspect.get();
+        return Optional.of(TemplatingEngine.Companion.replace(createReplacementMap(suppliedAspect), ASPECT_TEMPLATE))
+                .stream()
+                .map(toWriteAspect -> Map.entry(
+                        suppliedAspect.getName().get().getAspectClassName(),
+                        toWriteAspect
+                ));
+    }
+
+    @NotNull
+    private static Map<String, String> createReplacementMap(SuppliedAspect suppliedAspect) {
+        var toReplace = Map.of(
+                suppliedAspect.aspectClassId(), suppliedAspect.getName().get().getAspectClassName(),
+                suppliedAspect.adviceId(), suppliedAspect.getAdvice().get(),
+                suppliedAspect.aspectFunctionId(), suppliedAspect.getName().get().getAspectFunctionName(),
+                suppliedAspect.afterId(), getPointcut(suppliedAspect, supplied -> supplied instanceof SuppliedAfterPointcut suppliedFound ? suppliedFound.getPc() : ""),
+                suppliedAspect.aroundId(), getPointcut(suppliedAspect, supplied -> supplied instanceof SuppliedAroundPointcut suppliedFound ? suppliedFound.getPc() : ""),
+                suppliedAspect.beforeId(), getPointcut(suppliedAspect, supplied -> supplied instanceof SuppliedBeforePointcut suppliedFound ? suppliedFound.getPc() : ""),
+                suppliedAspect.monitoringTypes(), suppliedAspect.getMonitoringTypes().get()
+        );
+        return toReplace;
+    }
+
     private TracingAspectSupplier getPatterns(Element l) {
         var lo = getTy(l) ;
-        writeToFile("tracing/src/main/resources/out_file", lo.toString() );
         return lo.stream().findAny().map(this::getValue)
                 .orElse(null);
 
@@ -76,33 +81,81 @@ public class TracingProcessor extends AbstractProcessor {
 
     private TracingAspectSupplier getValue(AnnotationMirror cdcElement) {
         var cdcElementValues = cdcElement.getElementValues();
-        List<Before> before = getAnnotationValue(cdcElementValues, "before");
-        List<After> after = getAnnotationValue(cdcElementValues, "After");
-        List<Around> around = getAnnotationValue(cdcElementValues, "Around");
-        List<Pointcut> pointCut = getAnnotationValue(cdcElementValues, "Pointcut");
-        List<Aspect> aspect = getAnnotationValue(cdcElementValues, "Aspect");
-        return new TracingAspectSupplier(before, after, around, pointCut, aspect);
+        return new TracingAspectSupplier(
+                getAnnotationValue(cdcElementValues, "before", "value"),
+                getAnnotationValue(cdcElementValues, "after", "value"),
+                getAnnotationValue(cdcElementValues, "around", "value"),
+                getAnnotationValue(cdcElementValues, "pointcut", "value"),
+                getAnnotationValue(cdcElementValues, "aspect", "value"),
+                getAnnotationEnumValue(cdcElementValues, "monitoringTypes"),
+                getAnnotationStringValueByKey(cdcElementValues, "aspectName"),
+                getAnnotationStringValueByKey(cdcElementValues, "aspectFunctionName")
+        );
     }
 
-    private static <T> List<T> getAnnotationValue(Map<? extends ExecutableElement, ? extends AnnotationValue> f, String before) {
-        return f.entrySet().stream()
-                .filter(s -> s.getKey().getSimpleName().toString().contains(before))
+
+    private static String getAnnotationStringValueByKey(Map<? extends ExecutableElement, ? extends AnnotationValue> annotationValues,
+                                                        String filterKey) {
+        return (String) annotationValues.entrySet().stream()
+                .filter(k -> k.getKey().getSimpleName().toString().startsWith(filterKey))
+                .findAny()
+                .map(Map.Entry::getValue)
+                .map(AnnotationValue::getValue)
+                .orElse(null);
+    }
+
+    private static List<String> getAnnotationEnumValue(Map<? extends ExecutableElement, ? extends AnnotationValue> annotationValues,
+                                                       String filterKey) {
+        return annotationValues.entrySet().stream()
+                .filter(s -> s.getKey().getSimpleName().toString().contains(filterKey))
                 .findAny().map(Map.Entry::getValue)
-                .map(TracingProcessor::<T>getTy)
-                .orElse(new ArrayList<>());
+                .map(TracingProcessor::getTy)
+                .stream()
+                .map(Object::toString)
+                .toList();
+    }
+
+    private static List<String> getAnnotationValue(Map<? extends ExecutableElement, ? extends AnnotationValue> annotationValues,
+                                                   String filterKey,
+                                                   String annotationFieldName) {
+        return annotationValues.entrySet().stream()
+                .filter(s -> s.getKey().getSimpleName().toString().contains(filterKey))
+                .findAny()
+                .map(Map.Entry::getValue)
+                .map(TracingProcessor::getTy)
+                .stream()
+                .flatMap(Collection::stream)
+                .flatMap(i -> annotationMirrorToString(i, annotationFieldName))
+                .toList();
+    }
+
+    @NotNull
+    private static Stream<String> annotationMirrorToString(Object i, String annotationFieldName) {
+        if (i instanceof AnnotationMirror annotationMirror)  {
+            return annotationMirror.getElementValues().entrySet().stream()
+                    .filter(k -> k.getKey().toString().contains(annotationFieldName))
+                    .map(e -> e.getValue().getValue().toString());
+        } else if (i instanceof AnnotationValue annotationValue) {
+            if (annotationValue.getValue() instanceof String value)
+                return Stream.of(value);
+            else
+                return Stream.of(annotationValue.toString());
+        }
+        return Stream.empty();
     }
 
     @NotNull
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static <T> List<T> getTy(AnnotationValue value) {
-        writeToFile("tracing/src/main/resources/out_file1", value.toString() );
+    private static List<?> getTy(AnnotationValue value) {
         if (value.getValue() instanceof List list && !list.isEmpty()) {
             try {
-                return (List<T>) value.getValue();
+                return (List) value.getValue();
             } catch (ClassCastException ignored) {
             }
+        } else {
+            return List.of(value.getValue());
         }
-        return new ArrayList<>();
+        return new ArrayList();
     }
 
     @NotNull
@@ -115,17 +168,13 @@ public class TracingProcessor extends AbstractProcessor {
                         return list.stream();
                     else if (t instanceof AnnotationMirror m)
                         return Stream.of(m);
-                    return Stream.empty();
+                    else return Stream.of(t.toString());
                 })
                 .toList();
     }
 
     private static void writeToFile(String name, String e) {
-        try (var fod = new FileOutputStream(name)) {
-            fod.write(e.getBytes(StandardCharsets.UTF_8));
-        } catch (IOException ignored) {
-
-        }
+        System.out.println(name + ": " + e);
     }
 
     private static String getPointcut(SuppliedAspect suppliedAspect, Function<SuppliedPointcut, String> created) {

@@ -17,7 +17,7 @@ open class CdcObservabilityAspect(
     @Around("@annotation(logged)")
     @Throws(Throwable::class)
     public open fun doCdc(joinPoint: ProceedingJoinPoint, logged: Logged): Any? {
-        return observation.doObservation(ObservationBehavior.LoggedObservationArgs(joinPoint, logged))
+        return observation.doObservation(ObservationBehavior.LoggedObservationArgs(joinPoint, logged, logged.monitoringTypes.toList()))
     }
 
 }
