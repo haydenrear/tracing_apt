@@ -56,7 +56,7 @@ data class TracingAspectSupplier(
             }
         }, object:MonitoringTypesSupplier {
             override fun get(): String {
-                if (monitoringTypes.size == 0)
+                if (monitoringTypes.isEmpty())
                     return "List.of()";
                 return "List.of(${monitoringTypes.map { "MonitoringTypes.${it}" }.joinToString(",")})";
             }

@@ -1,5 +1,7 @@
 package com.hayden.tracing.template
 
+import com.squareup.javapoet.TypeSpec
+import org.springframework.javapoet.JavaFile
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -23,6 +25,16 @@ class TemplatingEngine {
             }
             return outBuilder.toString();
         }
+
+//       fun buildAspect(
+//
+//       )  {
+//           JavaFile.builder("",
+//               TypeSpec.classBuilder("")
+//                   .addMethod()
+//           )
+//       }
+
     }
 
 }

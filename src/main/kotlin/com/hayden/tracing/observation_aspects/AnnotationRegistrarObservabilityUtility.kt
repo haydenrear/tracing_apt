@@ -21,24 +21,27 @@ class AnnotationRegistrarObservabilityUtility : ObservationUtility<ObservationBe
             mutableMap[argumentExtractor] = argumentExtractor.createInstance()
     }
 
-    override fun extract(argumentExtractor: ObservationBehavior.LoggedObservationArgs, proceeding: JoinPoint): Map<String, *>? {
+    override fun extract(argumentExtractor: ObservationBehavior.LoggedObservationArgs): Map<String, *>? {
         add(argumentExtractor.logged.argumentExtractor, arguments)
-        return arguments[argumentExtractor.logged.argumentExtractor]?.extract(proceeding, this)
+        serializer(argumentExtractor)
+        return arguments[argumentExtractor.logged.argumentExtractor]
+            ?.extract(argumentExtractor, this)
     }
 
     override fun consumer(argumentExtractor: ObservationBehavior.LoggedObservationArgs, trace: Trace) {
         add(argumentExtractor.logged.messageCapture, consumer)
-        consumer[argumentExtractor.logged.messageCapture]?.mapMessage(trace)
+        consumer[argumentExtractor.logged.messageCapture]
+            ?.mapMessage(trace)
     }
 
-    override fun matches(argumentExtractor: ObservationBehavior.LoggedObservationArgs) {
+    fun matches(argumentExtractor: ObservationBehavior.LoggedObservationArgs) {
         argumentExtractor.logged.behaviorMatcher
             .filter { !matcher.contains(it) }
             .map { Pair(it, it.createInstance()) }
             .forEach { matcher[it.first] = it.second }
     }
 
-    override fun serializer(argumentExtractor: ObservationBehavior.LoggedObservationArgs) {
+    fun serializer(argumentExtractor: ObservationBehavior.LoggedObservationArgs) {
         argumentExtractor.logged.classSerializers
             .filter { !serializers.contains(it) }
             .map { Pair(it, it.createInstance()) }
@@ -58,8 +61,11 @@ class AnnotationRegistrarObservabilityUtility : ObservationUtility<ObservationBe
         return serializersCache[value::class];
     }
 
-    override fun matchers(): MutableCollection<BehaviorMatcher> {
-        return matcher.values
+    override fun matchers(args: ObservationUtility.ObservationArgs): List<BehaviorMatcher> {
+        if (args is ObservationBehavior.LoggedObservationArgs) {
+            matches(args)
+        }
+        return matcher.values.toList()
     }
 
 }

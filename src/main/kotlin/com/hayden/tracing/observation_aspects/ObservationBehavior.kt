@@ -56,12 +56,11 @@ class ObservationBehavior(
     private fun <T: ObservationUtility.ObservationArgs> doDelegateObserve(
         observationArgs: T, observationUtility: ObservationUtility<T>
     ): Any? {
-        observationUtility.serializer(observationArgs)
 
         val trace = Trace(
             Instant.now(),
             MessageMetadata(TraceMetadata(tracingProps.toServiceIds()), LogType.MESSAGE),
-            Message(observationUtility.extract(observationArgs, observationArgs.joinPoint), observationArgs.id)
+            Message(observationUtility.extract(observationArgs), observationArgs.id)
         )
 
         observationUtility.consumer(observationArgs, trace)
@@ -69,19 +68,19 @@ class ObservationBehavior(
         val out = Observation.createNotStarted(observationArgs.id, observationRegistry)
             .lowCardinalityKeyValue("trace", trace.toString())
 
-        if (observationArgs.joinPoint is ProceedingJoinPoint) {
-            return out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() });
+        return if (observationArgs.joinPoint is ProceedingJoinPoint) {
+            out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() });
         } else {
-            ContextRegistry.getInstance().registerContextAccessor(ReactorContextAccessor())
-            ContextRegistry.getInstance().registerThreadLocalAccessor("UUID", ThreadLocal.withInitial({"hello"}))
-            val context = Context.empty();
-            val snapshot = ContextSnapshotFactory.builder()
-                .contextRegistry(ContextRegistry.getInstance())
-                .build().captureAll(context)
-            val get = context.get<String>("")
-//            snapshot.setThreadLocals()
+    //            ContextRegistry.getInstance().registerContextAccessor(ReactorContextAccessor())
+    //            ContextRegistry.getInstance().registerThreadLocalAccessor("UUID", ThreadLocal.withInitial({"hello"}))
+    //            val context = Context.empty();
+    //            val snapshot = ContextSnapshotFactory.builder()
+    //                .contextRegistry(ContextRegistry.getInstance())
+    //                .build().captureAll(context)
+    //            val get = context.get<String>("")
+    ////            snapshot.setThreadLocals()
 
-            return null
+            null
         }
 
     }

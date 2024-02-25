@@ -4,6 +4,7 @@ import com.hayden.tracing.model.Trace
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class DiObservationUtility(
@@ -13,30 +14,40 @@ class DiObservationUtility(
     val matcher:  List<BehaviorMatcher>
 ) : ObservationUtility<ObservationBehavior.DiObservationArgs> {
 
+    val serializersCache: MutableMap<KClass<*>, ClassSerializer> = mutableMapOf()
+
     override fun consumer(argumentExtractor: ObservationBehavior.DiObservationArgs, trace: Trace) {
-        TODO("Not yet implemented")
-    }
-
-    override fun matches(argumentExtractor: ObservationBehavior.DiObservationArgs) {
-        TODO("Not yet implemented")
-    }
-
-    override fun serializer(argumentExtractor: ObservationBehavior.DiObservationArgs) {
-        TODO("Not yet implemented")
+        consumer.forEach { it.mapMessage(trace) }
     }
 
     override fun extract(
-        argumentExtractor: ObservationBehavior.DiObservationArgs,
-        proceeding: JoinPoint
-    ): Map<String, *>? {
-        TODO("Not yet implemented")
+        argumentExtractor: ObservationBehavior.DiObservationArgs
+    ): Map<String, *> {
+        return arguments
+            .flatMap { it.extract(argumentExtractor, this).entries }
+            .associate { Pair(it.key, it.value) }
+
     }
 
     override fun getSerializer(value: Any): ClassSerializer? {
-        TODO("Not yet implemented")
+        return getSerializerCache(value)
     }
 
-    override fun matchers(): MutableCollection<BehaviorMatcher> {
-        TODO("Not yet implemented")
+    override fun matchers(args: ObservationUtility.ObservationArgs): List<BehaviorMatcher> {
+        return matcher
     }
+
+    fun getSerializerCache(value: Any): ClassSerializer? {
+        if (serializersCache.containsKey(value::class))  {
+            return serializersCache[value::class]
+        }
+
+        serializers
+            .filter { it.matches(value::class.java) }
+            .take(1)
+            .forEach { serializersCache[value::class] = it }
+
+        return serializersCache[value::class];
+    }
+
 }

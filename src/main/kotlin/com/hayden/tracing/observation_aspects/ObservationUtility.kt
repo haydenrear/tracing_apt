@@ -12,14 +12,10 @@ interface ObservationUtility<T: ObservationUtility.ObservationArgs> {
         val monitoringTypes: List<MonitoringTypes>
     }
 
-    fun extract(
-        argumentExtractor: T,
-        proceeding: JoinPoint
-    ): Map<String, *>?
+    fun extract(argumentExtractor: T): Map<String, *>?
 
     fun consumer(argumentExtractor: T, trace: Trace)
-    fun matches(argumentExtractor: T)
-    fun serializer(argumentExtractor: T)
     fun getSerializer(value: Any): ClassSerializer?
-    fun matchers(): MutableCollection<BehaviorMatcher>
+    fun matchers(args: ObservationArgs): List<BehaviorMatcher>
+
 }
