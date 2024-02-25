@@ -24,9 +24,7 @@ public class {{aspect_name}} {
 
 
 
-    {{around}}
-    {{after}}
-    {{before}}
+    {{around}}{{after}}{{before}}
     public Object {{aspect_fn_name}}(ProceedingJoinPoint joinPoint) {
         return observation.doObservation(new ObservationBehavior.DiObservationArgs(joinPoint, "{{aspect_name}}", {{monitoring_types}}));
     }

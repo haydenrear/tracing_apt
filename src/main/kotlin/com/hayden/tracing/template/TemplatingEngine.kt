@@ -17,7 +17,8 @@ class TemplatingEngine {
                         read = read.replace("{{${value.key}}}", value.value.strip().replace(System.lineSeparator(), ""))
                     }
 
-                    outBuilder.append(System.lineSeparator()).append(read)
+                    if (read.isNotEmpty())
+                        outBuilder.append(System.lineSeparator()).append(read)
                 }
             }
             return outBuilder.toString();
