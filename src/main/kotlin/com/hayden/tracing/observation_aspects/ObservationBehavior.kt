@@ -9,9 +9,13 @@ import io.micrometer.context.ContextSnapshotFactory
 import io.micrometer.context.ThreadLocalAccessor
 import io.micrometer.observation.Observation
 import io.micrometer.observation.Observation.CheckedFunction
+import io.micrometer.observation.ObservationHandler
 import io.micrometer.observation.ObservationRegistry
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor
 import io.micrometer.tracing.contextpropagation.ObservationAwareSpanThreadLocalAccessor
+import net.bytebuddy.ByteBuddy
+import net.bytebuddy.agent.builder.AgentBuilder
+import net.bytebuddy.matcher.ElementMatchers
 import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component
 import reactor.netty.contextpropagation.ChannelContextAccessor
@@ -67,7 +71,9 @@ class ObservationBehavior(
 
         val out = Observation.createNotStarted(observationArgs.id, observationRegistry)
             .lowCardinalityKeyValue("trace", trace.toString())
-
+//        AgentBuilder.Default().type(ElementMatchers.named("com.hayden.tracing.Logged"))
+//            .transform()
+//            .installOn()
         return if (observationArgs.joinPoint is ProceedingJoinPoint) {
             out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() });
         } else {
