@@ -3,25 +3,10 @@ package com.hayden.tracing.observation_aspects
 import com.hayden.tracing.model.*
 import com.hayden.tracing.props.TracingConfigurationProperties
 import com.hayden.tracing_apt.Logged
-import io.micrometer.context.ContextAccessor
-import io.micrometer.context.ContextRegistry
-import io.micrometer.context.ContextSnapshotFactory
-import io.micrometer.context.ThreadLocalAccessor
 import io.micrometer.observation.Observation
-import io.micrometer.observation.Observation.CheckedFunction
-import io.micrometer.observation.ObservationHandler
 import io.micrometer.observation.ObservationRegistry
-import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor
-import io.micrometer.tracing.contextpropagation.ObservationAwareSpanThreadLocalAccessor
-import net.bytebuddy.ByteBuddy
-import net.bytebuddy.agent.builder.AgentBuilder
-import net.bytebuddy.matcher.ElementMatchers
 import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component
-import reactor.netty.contextpropagation.ChannelContextAccessor
-import reactor.util.context.Context
-import reactor.util.context.ContextView
-import reactor.util.context.ReactorContextAccessor
 import java.time.Instant
 import java.util.function.Supplier
 
