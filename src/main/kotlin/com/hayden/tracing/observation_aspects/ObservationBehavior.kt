@@ -56,9 +56,6 @@ class ObservationBehavior(
 
         val out = Observation.createNotStarted(observationArgs.id, observationRegistry)
             .highCardinalityKeyValue("trace", trace.toString())
-//        AgentBuilder.Default().type(ElementMatchers.named("com.hayden.tracing.Logged"))
-//            .transform()
-//            .installOn()
         return if (observationArgs.joinPoint is ProceedingJoinPoint) {
             val o = out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() })
             return o
