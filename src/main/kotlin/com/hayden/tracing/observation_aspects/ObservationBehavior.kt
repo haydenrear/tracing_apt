@@ -55,12 +55,13 @@ class ObservationBehavior(
         observationUtility.consumer(observationArgs, trace)
 
         val out = Observation.createNotStarted(observationArgs.id, observationRegistry)
-            .lowCardinalityKeyValue("trace", trace.toString())
+            .highCardinalityKeyValue("trace", trace.toString())
 //        AgentBuilder.Default().type(ElementMatchers.named("com.hayden.tracing.Logged"))
 //            .transform()
 //            .installOn()
         return if (observationArgs.joinPoint is ProceedingJoinPoint) {
-            out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() });
+            val o = out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() })
+            return o
         } else {
     //            ContextRegistry.getInstance().registerContextAccessor(ReactorContextAccessor())
     //            ContextRegistry.getInstance().registerThreadLocalAccessor("UUID", ThreadLocal.withInitial({"hello"}))

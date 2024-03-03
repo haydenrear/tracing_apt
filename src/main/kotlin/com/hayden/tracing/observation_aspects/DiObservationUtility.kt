@@ -20,9 +20,7 @@ class DiObservationUtility(
         consumer.forEach { it.mapMessage(trace) }
     }
 
-    override fun extract(
-        argumentExtractor: ObservationBehavior.DiObservationArgs
-    ): Map<String, *> {
+    override fun extract(argumentExtractor: ObservationBehavior.DiObservationArgs): Map<String, *> {
         return arguments
             .flatMap { it.extract(argumentExtractor, this).entries }
             .associate { Pair(it.key, it.value) }
