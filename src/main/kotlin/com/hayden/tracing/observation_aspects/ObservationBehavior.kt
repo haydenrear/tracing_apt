@@ -1,5 +1,6 @@
 package com.hayden.tracing.observation_aspects
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.hayden.tracing.model.*
 import com.hayden.tracing.props.TracingConfigurationProperties
 import com.hayden.tracing_apt.Logged
@@ -15,8 +16,10 @@ class ObservationBehavior(
     private val observationRegistry: ObservationRegistry,
     private val loggedObservabilityUtility: ObservationUtility<LoggedObservationArgs>,
     private val observabilityUtility: ObservationUtility<DiObservationArgs>,
-    private val tracingProps: TracingConfigurationProperties
+    private val tracingProps: TracingConfigurationProperties,
+    private val om: ObjectMapper
 ) {
+
 
     data class LoggedObservationArgs(
         override val joinPoint: ProceedingJoinPoint,
@@ -55,7 +58,7 @@ class ObservationBehavior(
         observationUtility.consumer(observationArgs, trace)
 
         val out = Observation.createNotStarted(observationArgs.id, observationRegistry)
-            .highCardinalityKeyValue("trace", trace.toString())
+            .highCardinalityKeyValue("trace", om.writeValueAsString(trace))
         return if (observationArgs.joinPoint is ProceedingJoinPoint) {
             val o = out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() })
             return o
