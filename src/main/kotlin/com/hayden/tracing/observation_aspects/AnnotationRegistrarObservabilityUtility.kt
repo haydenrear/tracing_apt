@@ -21,7 +21,7 @@ class AnnotationRegistrarObservabilityUtility : ObservationUtility<ObservationBe
             mutableMap[argumentExtractor] = argumentExtractor.createInstance()
     }
 
-    override fun extract(argumentExtractor: ObservationBehavior.LoggedObservationArgs): Map<String, *>? {
+    override fun extractData(argumentExtractor: ObservationBehavior.LoggedObservationArgs): Map<String, *>? {
         add(argumentExtractor.logged.argumentExtractor, arguments)
         serializer(argumentExtractor)
         return arguments[argumentExtractor.logged.argumentExtractor]

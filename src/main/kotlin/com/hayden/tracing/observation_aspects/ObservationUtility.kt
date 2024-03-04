@@ -2,7 +2,6 @@ package com.hayden.tracing.observation_aspects
 
 import com.hayden.tracing.model.Trace
 import org.aspectj.lang.JoinPoint
-import org.aspectj.lang.ProceedingJoinPoint
 
 interface ObservationUtility<T: ObservationUtility.ObservationArgs> {
 
@@ -12,8 +11,10 @@ interface ObservationUtility<T: ObservationUtility.ObservationArgs> {
         val monitoringTypes: List<MonitoringTypes>
     }
 
-    fun extract(argumentExtractor: T): Map<String, *>?
-
+    fun extractData(argumentExtractor: T): Map<String, *>?
+    fun extractTrace(argumentExtractor: T): Map<String, *>? {
+        return null
+    }
     fun consumer(argumentExtractor: T, trace: Trace)
     fun getSerializer(value: Any): ClassSerializer?
     fun matchers(args: ObservationArgs): List<BehaviorMatcher>

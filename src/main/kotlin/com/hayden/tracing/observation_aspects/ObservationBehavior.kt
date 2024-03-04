@@ -52,16 +52,17 @@ class ObservationBehavior(
         val trace = Trace(
             Instant.now(),
             MessageMetadata(TraceMetadata(tracingProps.toServiceIds()), LogType.MESSAGE),
-            Message(observationUtility.extract(observationArgs), observationArgs.id)
+            Message(observationUtility.extractTrace(observationArgs), observationArgs.id)
         )
 
         observationUtility.consumer(observationArgs, trace)
 
         val out = Observation.createNotStarted(observationArgs.id, observationRegistry)
             .highCardinalityKeyValue("trace", om.writeValueAsString(trace))
+            .highCardinalityKeyValue("data", om.writeValueAsString(observationUtility.extractData(observationArgs)))
+
         return if (observationArgs.joinPoint is ProceedingJoinPoint) {
-            val o = out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() })
-            return o
+            return out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() })
         } else {
     //            ContextRegistry.getInstance().registerContextAccessor(ReactorContextAccessor())
     //            ContextRegistry.getInstance().registerThreadLocalAccessor("UUID", ThreadLocal.withInitial({"hello"}))
@@ -70,7 +71,7 @@ class ObservationBehavior(
     //                .contextRegistry(ContextRegistry.getInstance())
     //                .build().captureAll(context)
     //            val get = context.get<String>("")
-    ////            snapshot.setThreadLocals()
+    //            snapshot.setThreadLocals()
 
             null
         }
