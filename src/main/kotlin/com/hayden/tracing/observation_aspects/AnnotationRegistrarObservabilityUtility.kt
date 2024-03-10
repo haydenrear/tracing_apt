@@ -1,8 +1,6 @@
 package com.hayden.tracing.observation_aspects
 
 import com.hayden.tracing.model.Trace
-import org.aspectj.lang.JoinPoint
-import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
@@ -10,7 +8,7 @@ import kotlin.reflect.full.createInstance
 @Component
 class AnnotationRegistrarObservabilityUtility : ObservationUtility<ObservationBehavior.LoggedObservationArgs> {
 
-    val arguments: MutableMap<KClass<out ArgumentExtractor>, ArgumentExtractor> = mutableMapOf()
+    val arguments: MutableMap<KClass<out BehaviorDataExtractor>, BehaviorDataExtractor> = mutableMapOf()
     val consumer: MutableMap<KClass<out MessageCapture>, MessageCapture> = mutableMapOf()
     val serializers: MutableMap<KClass<out ClassSerializer>, ClassSerializer> = mutableMapOf()
     val serializersCache: MutableMap<KClass<*>, ClassSerializer> = mutableMapOf()
@@ -46,6 +44,10 @@ class AnnotationRegistrarObservabilityUtility : ObservationUtility<ObservationBe
             .filter { !serializers.contains(it) }
             .map { Pair(it, it.createInstance()) }
             .forEach { serializers[it.first] = it.second }
+    }
+
+    override fun extractTrace(argumentExtractor: ObservationBehavior.LoggedObservationArgs): Map<String, *> {
+        return hashMapOf<String, String>()
     }
 
     override fun getSerializer(value: Any): ClassSerializer? {

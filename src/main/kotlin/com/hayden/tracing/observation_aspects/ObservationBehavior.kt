@@ -25,7 +25,7 @@ class ObservationBehavior(
         override val joinPoint: ProceedingJoinPoint,
         val logged: Logged,
         override val monitoringTypes: List<MonitoringTypes>
-    ) : ObservationUtility.ObservationArgs {
+    ) : ObservationUtility.JoinPointObservationArgs {
         override val id: String
             get() = logged.logId
     }
@@ -34,18 +34,48 @@ class ObservationBehavior(
         override val joinPoint: ProceedingJoinPoint,
         override val id: String,
         override val monitoringTypes: List<MonitoringTypes>
-    ) : ObservationUtility.ObservationArgs
+    ) : ObservationUtility.JoinPointObservationArgs
+
+    data class AgentObservationArgs(
+        override val id: String,
+        override val monitoringTypes: List<MonitoringTypes>,
+        val joinPoint: AdviceJoinPoint
+    ): ObservationUtility.ObservationArgs {
+
+        data class AdviceJoinPoint(val advice: AgentAdvice,
+                                   val args: Map<String, *>)
+
+        enum class AgentAdvice {
+            Enter, Exit
+        }
+
+        override fun args(): Map<String, *> {
+            return joinPoint.args
+        }
+
+    }
 
 
     fun doObservation(observationArgs: ObservationUtility.ObservationArgs): Any? {
         return when (observationArgs) {
             is LoggedObservationArgs -> doDelegateObserve(observationArgs, loggedObservabilityUtility)
             is DiObservationArgs -> doDelegateObserve(observationArgs, observabilityUtility)
+            is AgentObservationArgs  -> doAgentObservationArgs(observationArgs)
             else -> null
         }
     }
 
-    private fun <T: ObservationUtility.ObservationArgs> doDelegateObserve(
+    private fun doAgentObservationArgs(observationArgs: AgentObservationArgs) {
+        if (observationArgs.joinPoint.advice == AgentObservationArgs.AgentAdvice.Enter) {
+
+        } else if (observationArgs.joinPoint.advice == AgentObservationArgs.AgentAdvice.Exit) {
+
+        } else {
+
+        }
+    }
+
+    private fun <T: ObservationUtility.JoinPointObservationArgs> doDelegateObserve(
         observationArgs: T, observationUtility: ObservationUtility<T>
     ): Any? {
 

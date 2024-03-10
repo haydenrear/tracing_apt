@@ -1,14 +1,12 @@
 package com.hayden.tracing.observation_aspects
 
 import com.hayden.tracing.model.Trace
-import org.aspectj.lang.JoinPoint
-import org.aspectj.lang.ProceedingJoinPoint
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
 @Component
 class DiObservationUtility(
-    val arguments: List<ArgumentExtractor>,
+    val arguments: List<BehaviorDataExtractor>,
     val consumer: List<MessageCapture>,
     val serializers: List<ClassSerializer>,
     val matcher:  List<BehaviorMatcher>
@@ -25,6 +23,10 @@ class DiObservationUtility(
             .flatMap { it.extract(argumentExtractor, this).entries }
             .associate { Pair(it.key, it.value) }
 
+    }
+
+    override fun extractTrace(argumentExtractor: ObservationBehavior.DiObservationArgs): Map<String, *>? {
+        TODO("Not yet implemented")
     }
 
     override fun getSerializer(value: Any): ClassSerializer? {

@@ -1,7 +1,6 @@
 package com.hayden.tracing_apt;
 
 import com.hayden.tracing.observation_aspects.*;
-import lombok.ToString;
 
 import java.lang.annotation.*;
 
@@ -13,7 +12,7 @@ public @interface Logged {
      * Extract the arguments from the method call.
      * @return
      */
-    Class<? extends ArgumentExtractor> argumentExtractor() default ArgumentExtractor.DefaultArgumentExtractor.class;
+    Class<? extends BehaviorDataExtractor> argumentExtractor() default BehaviorDataExtractor.DefaultBehaviorDataExtractor.class;
 
     /**
      * Perform some operation on the Trace after it is extracted.

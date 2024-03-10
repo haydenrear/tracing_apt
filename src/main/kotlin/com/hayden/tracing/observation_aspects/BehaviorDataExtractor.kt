@@ -1,11 +1,8 @@
 package com.hayden.tracing.observation_aspects
 
-import org.aspectj.lang.JoinPoint
-import org.aspectj.lang.ProceedingJoinPoint
+interface BehaviorDataExtractor {
 
-interface ArgumentExtractor {
-
-    class DefaultArgumentExtractor: ArgumentExtractor {
+    class DefaultBehaviorDataExtractor: BehaviorDataExtractor {
 
         override fun extract(proceeding: ObservationUtility.ObservationArgs,
                              utility: ObservationUtility<out ObservationUtility.ObservationArgs>): Map<String, *> {
