@@ -92,7 +92,7 @@ class ObservationBehavior(
             .highCardinalityKeyValue("data", om.writeValueAsString(observationUtility.extractData(observationArgs)))
 
         return if (observationArgs.joinPoint is ProceedingJoinPoint) {
-            return out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() })
+            out.observe(Supplier { (observationArgs.joinPoint as ProceedingJoinPoint).proceed() })
         } else {
     //            ContextRegistry.getInstance().registerContextAccessor(ReactorContextAccessor())
     //            ContextRegistry.getInstance().registerThreadLocalAccessor("UUID", ThreadLocal.withInitial({"hello"}))
