@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
 @Component
-class DiObservationUtility(
+open class DiObservationUtility(
     val arguments: List<BehaviorDataExtractor>,
     val consumer: List<MessageCapture>,
     val serializers: List<ClassSerializer>,

@@ -6,13 +6,12 @@ import org.springframework.stereotype.Component
 
 @ConfigurationProperties(prefix= "trace")
 @Component
- class TracingConfigurationProperties {
-    lateinit var serviceInstanceId: String
-    lateinit var serviceId: String
+open class TracingConfigurationProperties {
+
+    var serviceInstanceId: String? = null;
+    var serviceId: String? = null;
 
     fun toServiceIds(): ServiceIds {
-        return ServiceIds(serviceInstanceId, serviceId)
+        return ServiceIds(serviceInstanceId.orEmpty(), serviceId.orEmpty())
     }
-
-
 }

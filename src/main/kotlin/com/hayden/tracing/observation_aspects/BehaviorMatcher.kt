@@ -1,7 +1,6 @@
 package com.hayden.tracing.observation_aspects
 
 import org.aspectj.lang.JoinPoint
-import org.aspectj.lang.ProceedingJoinPoint
 import java.lang.reflect.Field
 
 interface BehaviorMatcher {

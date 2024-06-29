@@ -1,7 +1,5 @@
 package com.hayden.tracing.model
 
-import com.hayden.tracing_apt.Logged
-import lombok.extern.java.Log
 import org.springframework.boot.logging.LogLevel
 import java.time.Instant
 

@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 @Component
-class AnnotationRegistrarObservabilityUtility : ObservationUtility<ObservationBehavior.LoggedObservationArgs> {
+open class AnnotationRegistrarObservabilityUtility : ObservationUtility<ObservationBehavior.LoggedObservationArgs> {
 
     val arguments: MutableMap<KClass<out BehaviorDataExtractor>, BehaviorDataExtractor> = mutableMapOf()
     val consumer: MutableMap<KClass<out MessageCapture>, MessageCapture> = mutableMapOf()

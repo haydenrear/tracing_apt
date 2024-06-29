@@ -1,7 +1,7 @@
 package com.hayden.tracing.observation_aspects
 
 import com.hayden.tracing.model.*
-import com.hayden.tracing_apt.Logged
+import com.hayden.tracing.Logged
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect

@@ -3,7 +3,6 @@ package com.hayden.tracing.observation_aspects
 import com.hayden.tracing.model.Trace
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.reflect.CodeSignature
-import java.util.*
 
 interface ObservationUtility<T: ObservationUtility.ObservationArgs> {
 

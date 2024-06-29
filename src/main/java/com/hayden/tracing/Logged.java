@@ -1,4 +1,4 @@
-package com.hayden.tracing_apt;
+package com.hayden.tracing;
 
 import com.hayden.tracing.observation_aspects.*;
 

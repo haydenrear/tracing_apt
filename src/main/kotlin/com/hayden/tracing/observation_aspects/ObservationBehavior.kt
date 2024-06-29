@@ -3,7 +3,7 @@ package com.hayden.tracing.observation_aspects
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.hayden.tracing.model.*
 import com.hayden.tracing.props.TracingConfigurationProperties
-import com.hayden.tracing_apt.Logged
+import com.hayden.tracing.Logged
 import io.micrometer.observation.Observation
 import io.micrometer.observation.ObservationRegistry
 import org.aspectj.lang.ProceedingJoinPoint
@@ -12,12 +12,12 @@ import java.time.Instant
 import java.util.function.Supplier
 
 @Component
-class ObservationBehavior(
-    private val observationRegistry: ObservationRegistry,
-    private val loggedObservabilityUtility: ObservationUtility<LoggedObservationArgs>,
-    private val observabilityUtility: ObservationUtility<DiObservationArgs>,
-    private val tracingProps: TracingConfigurationProperties,
-    private val om: ObjectMapper
+open class ObservationBehavior(
+    val observationRegistry: ObservationRegistry,
+    val loggedObservabilityUtility: ObservationUtility<LoggedObservationArgs>,
+    val observabilityUtility: ObservationUtility<DiObservationArgs>,
+    val tracingProps: TracingConfigurationProperties,
+    val om: ObjectMapper
 ) {
 
 

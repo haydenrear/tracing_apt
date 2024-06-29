@@ -1,16 +1,16 @@
 package com.hayden.tracing.template
 
-import com.squareup.javapoet.TypeSpec
-import org.springframework.javapoet.JavaFile
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.charset.StandardCharsets
-import java.nio.file.Paths
+import com.hayden.tracing.observation_aspects.MonitoringTypes
+import java.io.File
+import java.io.StringWriter
+import java.nio.file.Path
+import java.util.*
+
 
 class TemplatingEngine {
 
     companion object {
-        fun replace(values: Map<String, String>, path: String): String {
+        fun replace(values: MutableMap<String, String>, path: String): String {
             val outBuilder = StringBuilder()
             TemplatingEngine::class.java.classLoader.getResourceAsStream(path)?.bufferedReader().use {
                 it?.readLines()?.forEach {
@@ -25,16 +25,6 @@ class TemplatingEngine {
             }
             return outBuilder.toString();
         }
-
-//       fun buildAspect(
-//
-//       )  {
-//           JavaFile.builder("",
-//               TypeSpec.classBuilder("")
-//                   .addMethod()
-//           )
-//       }
-
     }
 
 }

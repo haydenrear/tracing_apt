@@ -1,6 +1,5 @@
 package com.hayden.tracing.observation_aspects
 
-import org.aspectj.lang.annotation.*
 import java.util.function.Supplier
 
 open class SuppliedPointcut(open val pc: String)
