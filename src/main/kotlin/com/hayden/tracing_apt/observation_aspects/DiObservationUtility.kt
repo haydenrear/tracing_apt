@@ -1,6 +1,6 @@
-package com.hayden.tracing.observation_aspects
+package com.hayden.tracing_apt.observation_aspects
 
-import com.hayden.tracing.model.Trace
+import com.hayden.tracing_apt.model.Trace
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
@@ -10,23 +10,26 @@ open class DiObservationUtility(
     val consumer: List<MessageCapture>,
     val serializers: List<ClassSerializer>,
     val matcher:  List<BehaviorMatcher>
-) : ObservationUtility<ObservationBehavior.DiObservationArgs> {
+) : ObservationUtility<ObservationUtility.JoinPointObservationArgs> {
 
     val serializersCache: MutableMap<KClass<*>, ClassSerializer> = mutableMapOf()
 
-    override fun consumer(argumentExtractor: ObservationBehavior.DiObservationArgs, trace: Trace) {
+    override fun consumer(argumentExtractor: ObservationUtility.JoinPointObservationArgs, trace: Trace) {
         consumer.forEach { it.mapMessage(trace) }
     }
 
-    override fun extractData(argumentExtractor: ObservationBehavior.DiObservationArgs): Map<String, *> {
+    override fun extractData(argumentExtractor: ObservationUtility.JoinPointObservationArgs): Map<String, *> {
         return arguments
             .flatMap { it.extract(argumentExtractor, this).entries }
             .associate { Pair(it.key, it.value) }
 
     }
 
-    override fun extractTrace(argumentExtractor: ObservationBehavior.DiObservationArgs): Map<String, *>? {
-        TODO("Not yet implemented")
+    override fun extractTrace(argumentExtractor: ObservationUtility.JoinPointObservationArgs): Map<String, *>? {
+        return mutableMapOf(
+            Pair("MethodName", argumentExtractor.id),
+            Pair("JoinPointAction", argumentExtractor.advice.advice.joinPointAction)
+        )
     }
 
     override fun getSerializer(value: Any): ClassSerializer? {

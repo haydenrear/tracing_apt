@@ -1,6 +1,6 @@
-package com.hayden.tracing;
+package com.hayden.tracing_apt;
 
-import com.hayden.tracing.observation_aspects.*;
+import com.hayden.tracing_apt.observation_aspects.MonitoringTypes;
 import org.aspectj.lang.annotation.*;
 
 import java.lang.annotation.*;

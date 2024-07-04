@@ -1,4 +1,4 @@
-package com.hayden.tracing.observation_aspects
+package com.hayden.tracing_apt.observation_aspects
 
 import java.util.function.Supplier
 
@@ -37,23 +37,23 @@ data class TracingAspectSupplier(
     val aspectName: String
 ): Supplier<SuppliedAspect> {
     override fun get(): SuppliedAspect {
-        return SuppliedAspect(object:PointcutSupplier {
+        return SuppliedAspect(object: PointcutSupplier {
             override fun get(): Set<SuppliedPointcut> {
                 return mutableSetOf(
                     parseToBefore(),
                     after?.map { SuppliedAfterPointcut("@After(\"${it}\")") }?.firstOrNull() ?: SuppliedAfterPointcut(""),
-                    around?.map { SuppliedAroundPointcut("@Around(\"${it}\")")}?.firstOrNull() ?: SuppliedAroundPointcut(""),
+                    around?.map { SuppliedAroundPointcut("@Around(\"${it}\")") }?.firstOrNull() ?: SuppliedAroundPointcut(""),
                 )
             }
-        }, object:AdviceSupplier {
+        }, object: AdviceSupplier {
             override fun get(): String {
                 return pointCut?.map { "@PointCut(\"${it})\"" }?.firstOrNull() ?: ""
             }
-        }, object:AspectName{
+        }, object: AspectName {
             override fun get(): AspectMetadata {
                 return AspectMetadata(aspectName, aspectFunctionId)
             }
-        }, object:MonitoringTypesSupplier {
+        }, object: MonitoringTypesSupplier {
             override fun get(): String {
                 if (monitoringTypes.isEmpty())
                     return "List.of()";

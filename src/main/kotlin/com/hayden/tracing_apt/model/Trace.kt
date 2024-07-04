@@ -1,4 +1,4 @@
-package com.hayden.tracing.model
+package com.hayden.tracing_apt.model
 
 import org.springframework.boot.logging.LogLevel
 import java.time.Instant

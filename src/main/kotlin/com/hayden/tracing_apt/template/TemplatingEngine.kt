@@ -1,6 +1,6 @@
-package com.hayden.tracing.template
+package com.hayden.tracing_apt.template
 
-import com.hayden.tracing.observation_aspects.MonitoringTypes
+import com.hayden.tracing_apt.observation_aspects.MonitoringTypes
 import java.io.File
 import java.io.StringWriter
 import java.nio.file.Path

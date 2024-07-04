@@ -1,7 +1,7 @@
-package com.hayden.tracing.observation_aspects
+package com.hayden.tracing_apt.observation_aspects
 
-import com.hayden.tracing.model.*
-import com.hayden.tracing.Logged
+import com.hayden.tracing_apt.model.*
+import com.hayden.tracing_apt.Logged
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -17,7 +17,14 @@ open class CdcObservabilityAspect(
     @Around("@annotation(logged)")
     @Throws(Throwable::class)
     public open fun doCdc(joinPoint: ProceedingJoinPoint, logged: Logged): Any? {
-        return observation.doObservation(ObservationBehavior.LoggedObservationArgs(joinPoint, logged, logged.monitoringTypes.toList()))
+        return observation.doObservation(
+            ObservationBehavior.LoggedObservationArgs(
+                ObservationUtility.AdviceJoinPoint.from(joinPoint),
+                logged,
+                logged.monitoringTypes.toList(),
+                joinPoint,
+            )
+        )
     }
 
 }

@@ -1,17 +1,15 @@
-package com.hayden.tracing;
+package com.hayden.tracing_apt;
 
-import com.hayden.tracing.observation_aspects.*;
-import com.hayden.tracing.template.TemplatingEngine;
+import com.hayden.tracing_apt.observation_aspects.*;
+import com.hayden.tracing_apt.template.TemplatingEngine;
+import com.hayden.tracing_apt.observation_aspects.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -19,12 +17,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SupportedAnnotationTypes("com.hayden.tracing.Cdc")
+@SupportedAnnotationTypes("com.hayden.tracing_apt.Cdc")
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 @Slf4j
 public class TracingProcessor extends AbstractProcessor {
 
-    public static final String ASPECT_TEMPLATE = "com/hayden/tracing/template/observation_aspect_provided_template.txt";
+    public static final String ASPECT_TEMPLATE = "com/hayden/tracing_apt/template/observation_aspect_provided_template.txt";
 
 
     @SneakyThrows

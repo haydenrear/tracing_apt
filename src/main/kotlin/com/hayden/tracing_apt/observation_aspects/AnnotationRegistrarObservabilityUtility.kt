@@ -1,6 +1,6 @@
-package com.hayden.tracing.observation_aspects
+package com.hayden.tracing_apt.observation_aspects
 
-import com.hayden.tracing.model.Trace
+import com.hayden.tracing_apt.model.Trace
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance

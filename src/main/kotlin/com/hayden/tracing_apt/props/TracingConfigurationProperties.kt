@@ -1,6 +1,6 @@
-package com.hayden.tracing.props
+package com.hayden.tracing_apt.props
 
-import com.hayden.tracing.model.ServiceIds
+import com.hayden.tracing_apt.model.ServiceIds
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
