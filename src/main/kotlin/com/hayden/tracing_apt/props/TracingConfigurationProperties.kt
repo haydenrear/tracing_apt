@@ -11,7 +11,4 @@ open class TracingConfigurationProperties {
     var serviceInstanceId: String? = null;
     var serviceId: String? = null;
 
-    fun toServiceIds(): ServiceIds {
-        return ServiceIds(serviceInstanceId.orEmpty(), serviceId.orEmpty())
-    }
 }

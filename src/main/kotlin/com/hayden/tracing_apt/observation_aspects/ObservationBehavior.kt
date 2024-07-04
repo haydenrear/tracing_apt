@@ -67,7 +67,7 @@ open class ObservationBehavior(
 
         val trace = Trace(
             Instant.now(),
-            MessageMetadata(TraceMetadata(tracingProps.toServiceIds()), LogType.MESSAGE),
+            MessageMetadata(TraceMetadata(ServiceIds(tracingProps.serviceInstanceId ?: "",  tracingProps.serviceId ?: "")), LogType.MESSAGE),
             Message(observationUtility.extractTrace(observationArgs), observationArgs.id)
         )
 
@@ -80,7 +80,7 @@ open class ObservationBehavior(
         return if (observationArgs.advice.advice.joinPointAction == ObservationUtility.JoinPointAction.Enter) {
             out.observe(Supplier { observationArgs.proceed() })
         } else {
-            observationArgs.proceed()
+            out.observe(Supplier { observationArgs.proceed() })
         }
 
     }
