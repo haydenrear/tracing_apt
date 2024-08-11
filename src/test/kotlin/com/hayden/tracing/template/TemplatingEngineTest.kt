@@ -18,8 +18,8 @@ class TemplatingEngineTest {
             Pair("aspect_fn_name", "test"),
             Pair("aspect_name", "test"),
             Pair("monitoring_types", "test")
-        ));
-        println(out)
+        ), "src/main/resources/com/hayden/tracing_apt/template/observation_aspect_provided_template.txt");
+        println(out);
     }
 
 }
