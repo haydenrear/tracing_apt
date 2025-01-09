@@ -22,7 +22,6 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-
 tasks.test {
     enabled = true
 }
