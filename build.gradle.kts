@@ -11,13 +11,5 @@ tasks.register("prepareKotlinBuildScriptModel")
 
 
 dependencies {
-
-}
-
-tasks.test {
-    enabled = true
-}
-
-repositories {
-    mavenCentral()
+    implementation(project(":tracing_aspect"))
 }

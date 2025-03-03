@@ -3,7 +3,7 @@ package com.hayden.tracing_apt;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-import com.hayden.tracing_apt.Logged;
+import com.hayden.tracing_aspect.Logged;
 import com.hayden.tracing_apt.observation_aspects.MonitoringTypes;
 import org.aspectj.lang.annotation.*;
 import com.hayden.tracing_apt.model.*;
