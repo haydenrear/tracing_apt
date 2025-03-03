@@ -1,8 +1,7 @@
 package com.hayden.tracing_apt;
 
-import com.hayden.tracing_apt.observation_aspects.*;
+import com.hayden.tracing_aspect.observation_aspects.*;
 import com.hayden.tracing_apt.template.TemplatingEngine;
-import com.hayden.tracing_apt.observation_aspects.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
