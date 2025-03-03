@@ -17,8 +17,7 @@ open class ObservationBehavior(
     val loggedObservabilityUtility: ObservationUtility<LoggedObservationArgs>,
     val observabilityUtility: ObservationUtility<ObservationUtility.JoinPointObservationArgs>,
     val tracingProps: TracingConfigurationProperties,
-    val om: ObjectMapper
-) {
+    val om: ObjectMapper) {
 
 
     data class LoggedObservationArgs(
@@ -73,6 +72,8 @@ open class ObservationBehavior(
 
         observationUtility.consumer(observationArgs, trace)
 
+        // Observation context @tracing_apt.Logged calls DelegatingCdcObservationHandler
+        // to save event data in the database.
         val out = Observation.createNotStarted(observationArgs.id, observationRegistry)
             .highCardinalityKeyValue("trace", om.writeValueAsString(trace))
             .highCardinalityKeyValue("data", om.writeValueAsString(observationUtility.extractData(observationArgs)))
